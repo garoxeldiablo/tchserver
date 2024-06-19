@@ -1,17 +1,24 @@
-import express from 'express'
-import dotenv from 'dotenv'
-import cors from 'cors'
-import { testConnection} from './database/db.js'
-import { router } from './view/route.js'
+import express from "express";
+import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import db from "./config/db.js";
+import router from "./routes/route.js";
 
-const app = express()
-dotenv.config()
-app.use(cors())
-app.use(express.json())
+dotenv.config();
+const app = express();
 
-app.use(router)
+try {
+    await db.getConnection();
+    console.log('Database terhubung...');
+} catch (error) {
+    console.log('batal terhubung',error);
+}
 
-app.listen(process.env.APP_PORT, ()=>{
-    testConnection()
-    console.log(`Server is running at http://localhost:${process.env.APP_PORT}`)
-})
+
+app.use(cors({ credentials:true, origin:'http://localhost:5173' }));
+app.use(cookieParser());
+app.use(express.json());
+app.use(router);
+
+app.listen(5000, ()=> console.log('Server running at port 5000'));
