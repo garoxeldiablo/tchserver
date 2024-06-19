@@ -1,5 +1,5 @@
 import { query } from "../config/db.js"
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 // import createUsersTable from "../models/UserModel.js";
 
@@ -16,8 +16,8 @@ export const register = async (req, res) => {
     const { name, email, password, confPassword } = req.body;
     if (password !== confPassword) return res.status(400).json({ msg: "Password and Confirm Password do not match" });
 
-    const salt = await bcrypt.genSalt();
-    const hashPassword = await bcrypt.hash(password, salt);
+    const salt = await bcryptjs.genSalt();
+    const hashPassword = await bcryptjs.hash(password, salt);
 
     const insertUserQuery = `
         INSERT INTO users (name, email, password, img_user)
@@ -49,7 +49,7 @@ export const login = async (req, res) => {
 
         if (!user) return res.status(404).json({ msg: "Email not found" });
 
-        const match = await bcrypt.compare(password, user.password);
+        const match = await bcryptjs.compare(password, user.password);
         if (!match) return res.status(400).json({ msg: "Wrong Password" });
 
         const userId = user.id_user;
